@@ -11,15 +11,21 @@ contract Token {
     // mapping variable here
     mapping(address => uint) public balances;
 
+    // Constructor to set the owner
+    constructor() {
+        owner = msg.sender;
+    }
+
     // Modifier to check if the caller is the owner
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the owner can perform this action");
         _;
     }
 
-    // Constructor to set the owner
-    constructor() {
-        owner = msg.sender;
+    // Modifier to check if the caller is the token holder
+    modifier onlyHolder(address _add) {
+        require(msg.sender == _add, "You can only burn your own tokens");
+        _;
     }
 
     // mint function
@@ -29,11 +35,11 @@ contract Token {
     }
 
     // burn function
-    function burn(address _add, uint _val) public onlyOwner {
-        if (balances[_add] >= _val) {
-            totalSupply -= _val;
-            balances[_add] -= _val;
-        }
+    function burn(address _add, uint _val) public onlyHolder(_add) {
+        require(balances[_add] >= _val, "Insufficient balance");
+
+        totalSupply -= _val;
+        balances[_add] -= _val;
     }
 
     // transfer function
